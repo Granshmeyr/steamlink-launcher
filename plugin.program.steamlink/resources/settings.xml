@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="32001">
+        <setting label="32002" type="text" id="password" option="hidden"/>
+    </category>
+    <category label="32003">
+        <setting label="32004" type="bool" id="repository" default="true"/>
+        <setting label="32005" type="bool" id="dependency" default="true"/>
+        <setting label="32006" type="bool" id="wakeonlan" default="false"/>
+    </category>
+</settings>

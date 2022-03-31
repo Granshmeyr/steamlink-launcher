@@ -1,75 +1,82 @@
-[![GitHub Release][releases-shield]][releases]
-[![GPL license](https://img.shields.io/badge/License-GPL-blue.svg?style=for-the-badge)](LICENSE.md)
-![Project Maintenance][maintenance-shield1]
-[![Contributors][contributors-shield]][contributors]
-<a href="https://liberapay.com/Toast/donate"><img alt="Donate using Liberapay" align="right" align="top" src="https://liberapay.com/assets/widgets/donate.svg"></a>
-# Steamlink Launcher for OSMC
 
-This is a laucher only for Open Source Mediacenter (OSMC), the launcher installs two scripts that run and handles Steamlink remember this is all beta so report performance issues to Valve and launcher issues here, i will not handle performance issues at all will refer to Valve for that.
+
+
+
+
+# Steamlink Launcher for Xbian
+
+Kodi add-on which creates a launcher for Steamlink. Only for Xbian systems. The launcher simply handles the shutdown/startup of Kodi and Steamlink. This repository is a fork of https://github.com/swetoast/steamlink-launcher, originally for OSMC.
 
 ## Installation
 
-* download the [zip](https://github.com/swetoast/steamlink-launcher/releases) of the launcher and install it via Kodi
-* the addon installs Steamlink automatically, wakeuponlan is also supported if its installed all you have to do is create a file in home directory called .wakeup and add your MAC id `nano /home/osmc/.wakeup`
-* This addon needs Kodi version **19** to be installed since its **python 3**.
+* Download the add-on zip file and install.
+	* SSH into Xbian (default password is raspberry)
+	* Exit from configuration if necessary
+	* `cd ~`
+	*  `wget https://github.com/Granshmeyr/steamlink-launcher-xbian/releases/download/0.0.12/plugin.program.steamlink-v0.0.12.zip`
+	* Install .zip through Kodi interface (plugin zip will be located in Home)
+* (Optional) If you want to send a wake-on-lan packet to your host PC on launch, navigate to Steamlink Launcher > Settings > System > Turn on "Wake-on-lan functionality"
+	* Check *Notes* below for required configuration
 
-## Want to contribute
+## Security Notice
+This add-on stores the password for the "xbian" user in its settings file, in plain-text. This is necessary because the "xbian" user does not have NOPASSWD set for the necessary directories, unlike on OSMC.
+* The script makes the settings file read/writable only by user "xbian".
+* **Your password will be visible to everyone on your local network unless you secure Xbian's Samba shares which allow guest browsing by default:**
+	* SSH into Xbian (default password is raspberry)
+	* Exit from configuration if necessary
+	* `sudo nano /etc/samba/shares.conf`
+		* Change every line that says `guest ok = yes` to `guest ok = no`
+	* Create Samba password of your choice for user "xbian":
+		* `sudo smbpasswd xbian`
+	* Now when browsing the XBIAN Samba share from the local network, it will require you to provide the credentials you set for user "xbian"
 
+The settings file is deleted if you select to remove it when uninstalling the Steamlink Launcher.
 
-Make sure to lint your code so its proper then submit it via PR here on the tracker.
+This add-on installs a modified `steamlink.deb` which removes the `python:any` dependency (it would cause `python2` to be needlessly installed). It also modifies the `steamlink` binary so it reads the password from the add-on settings. This allows the Steamlink scripts to run sudo commands without a user prompt. Typically this would only happen on the first run, but it requires user input on the command line.
+
+## Notes
+Startup will be quite slow on the first launch. Reasons for this below.
+
+This add-on updates your repositories and checks for & installs Steamlink and its dependencies—only on the first run. If you need to re-run these functions, toggle on the respective options under Steamlink Launcher > Settings > System > ...on next run
+
+Wake-on-lan functionality requires the creation of a `.wakeup` file in `/home/xbian/`
+* SSH into Xbian (default password is raspberry)
+* Exit from configuration if necessary
+* `nano  /home/xbian/.wakeup`
+* Input the MAC address of your host pc
+	* Search up how to save & exit in "nano" if needed
+
+Steamlink Launcher was tested on fresh install RPi3 with latest Xbian image as of 31/3/2022.
+
+## Troubleshooting
+
+* Do not report issues related to this launcher on official forums.
+* You can file an issue and I will try to help.
+
+Possible issues (copied from original repo):
+
+If you are on RPi3+ especially, and your Steamlink immediately crashes on launch with a blurred/pixelated image:
+* SSH into Xbian (default password is raspberry)
+* Exit from configuration if necessary
+* `sudo nano /boot/config.txt`
+* Add a new line `gpu_mem=128` anywhere, or near the other similar lines for convenience.
+	* Search up how to save & exit in "nano" if needed
+
+RPi4 crashes in kernel with error message: `vc4_hdmi fef05700.hdmi: ASoC: error at snd_soc_dai_startup on fef05700.hdmi` (where's the fix?)
+
+Source: https://steamcommunity.com/app/353380/discussions/6/3193611900710760046/#c4328520278444207948
+
+## Credits
+
+Full list of people that contributed to this project
+
+* [Toast](https://github.com/swetoast) - original repository
+	* [Ludeeus](https://github.com/ludeeus) - code clean up
+	* [Valve/Slouken](https://github.com/swetoast/Steamlink-launcher/commits?author=slouken) - for additional code donations and for adding lib replacement for OSMC
+	* [sgroen88](https://github.com/sgroen88) - adding shell execution to the script
+	* [ninfur](https://github.com/ninfur) - fixing the watchdog
 
 ## Acknowledgement
 
 © 2022 Valve Corporation. All rights reserved. Valve, Steam Link and Steam are trademarks and/or 
 registered trademarks of Valve Corporation in the US and other countries. 
-
-## Credits
-
-Here is a full list of people that helped out on this project
-
-* [Ludeeus](https://github.com/ludeeus) - code clean up
-* [Valve/Slouken](https://github.com/swetoast/steamlink-launcher/commits?author=slouken) - for additional code donations and for adding lib replacement for OSMC
-* [sgroen88](https://github.com/sgroen88) - adding shell execution to the script
-* [ninfur](https://github.com/ninfur) - fixing the watchdog
-
-## Donator
-
-Here is a list of people that donated to this project, super thankful for people donating.
-
-* Moritz Goltdammer
-
-## Got issues
-
-* if the bug is related to the launcher, file an issue
-* if its related to OSMC like crashing the pi adding overlays etc start a thread on OSMC Forums.
-* if steamlink launches but there are issues then go to [Steam Forums](https://steamcommunity.com/app/353380/discussions/) for support.
-
-this makes it less spammy on the issue tracker with OSMC issues again this launcher does very little on a OS level all it does is starts steamlink.
-
-Known issues:
-
-if these fixes are out of date and its working report back on the tracker.
-
-RPI4 crashes in kernel with error message: `vc4_hdmi fef05700.hdmi: ASoC: error at snd_soc_dai_startup on fef05700.hdmi`
-
-if Steamlink complains about memory either edit in OSMC addon configuration or via ssh then type this `sudo nano /boot/config.txt` and then add or replace:
-```
-gpu_mem=128
-```
-Source: https://steamcommunity.com/app/353380/discussions/6/3193611900710760046/#c4328520278444207948
-
-## License
-
-Steamlink Launcher is licensed under GPL2
-
-## Links
-
-* [Valve Forums](https://steamcommunity.com/app/353380/discussions/6/)
-* [OSMC Forums](https://discourse.osmc.tv/t/regarding-steamlink/76800)
-
-[contributors-shield]: https://img.shields.io/github/contributors/swetoast/steamlink-launcher.svg?style=for-the-badge
-[contributors]: https://github.com/swetoast/steamlink-launcher/graphs/contributors/
-[license-shield]: https://img.shields.io/github/license/swetoast/steamlink-launcher.svg?style=for-the-badge
-[maintenance-shield1]: https://img.shields.io/badge/maintainer-Toast%20%40swetoast-blue.svg?style=for-the-badge
-[releases-shield]: https://img.shields.io/github/release/swetoast/steamlink-launcher.svg?style=for-the-badge
-[releases]: https://github.com/swetoast/steamlink-launcher/releases
